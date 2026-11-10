@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <provider
+      android:name="com.flexappicon.FlexAppIconInitProvider"
+      android:authorities="${applicationId}.flexappicon-init"
+      android:exported="false" />
+    <receiver
+      android:name="com.flexappicon.FlexAppIconAlarmReceiver"
+      android:exported="false" />
+  </application>
+</manifest>

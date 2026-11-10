@@ -1,0 +1,89 @@
+import groovy.json.JsonSlurper
+
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+// Minor version of the app's React Native, or null when it cannot be found.
+def reactNativeMinorVersion() {
+  def candidates = [
+    new File(projectDir, "../../react-native/package.json"),
+    new File(rootDir, "../node_modules/react-native/package.json"),
+  ]
+  for (File file : candidates) {
+    if (!file.exists()) continue
+    def parts = new JsonSlurper().parseText(file.text).version.tokenize(".")
+    if (parts.size() < 2) return null
+    if (parts[0] != "0") return 1000
+    return parts[1].replaceAll("[^0-9].*", "").toInteger()
+  }
+  return null
+}
+
+def isNewArchitectureEnabled() {
+  def minor = reactNativeMinorVersion()
+  // React Native 0.82 removed the legacy architecture.
+  if (minor != null && minor >= 82) return true
+  def flag = project.findProperty("newArchEnabled") ?: project.findProperty("react.newArchEnabled")
+  return flag != null && flag.toString() == "true"
+}
+
+def supportsNamespace() {
+  try {
+    def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize(".")
+    def major = parsed[0].toInteger()
+    def minor = parsed[1].toInteger()
+    return (major == 7 && minor >= 3) || major >= 8
+  } catch (Throwable ignored) {
+    return false
+  }
+}
+
+apply plugin: "com.android.library"
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
+}
+
+android {
+  if (supportsNamespace()) {
+    namespace "com.flexappicon"
+    sourceSets {
+      main {
+        manifest.srcFile "src/main/AndroidManifestNew.xml"
+      }
+    }
+  }
+
+  compileSdkVersion safeExtGet("compileSdkVersion", 34)
+
+  defaultConfig {
+    minSdkVersion safeExtGet("minSdkVersion", 21)
+    targetSdkVersion safeExtGet("targetSdkVersion", 34)
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  sourceSets {
+    main {
+      if (isNewArchitectureEnabled()) {
+        java.srcDirs += ["src/newarch/java"]
+      } else {
+        java.srcDirs += ["src/oldarch/java"]
+      }
+    }
+  }
+}
+
+repositories {
+  mavenCentral()
+  google()
+}
+
+dependencies {
+  // Resolved to react-android by the React Native Gradle plugin on 0.71+.
+  implementation "com.facebook.react:react-native:+"
+}
