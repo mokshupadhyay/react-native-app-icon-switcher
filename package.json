@@ -5,7 +5,7 @@
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
   "types": "lib/typescript/index.d.ts",
-  "author": "Moksh Upadhyay <mokshupadhyay4@gmail.com>",
+  "author": "Moksh Upadhyay <mokshupadhyay4@gmail.com> (https://mokshupadhyay.com)",
   "homepage": "https://github.com/mokshupadhyay/react-native-app-icon-switcher#readme",
   "repository": {
     "type": "git",

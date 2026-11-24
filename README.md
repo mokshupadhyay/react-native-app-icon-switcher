@@ -254,3 +254,7 @@ Scripted runs:
 
 - iOS: `xcrun simctl launch <device> org.reactjs.native.example.FlexAppIconExample -flexDemo icon/Midnight` switches icons. `-flexPayload '{flexAppIcon=Sunset;}'` feeds a push payload to the native handler before the app is active.
 - Android: `adb shell am start -W -a android.intent.action.VIEW -d flexappicon://icon/Midnight`.
+
+## Author
+
+Built and maintained by [Moksh Upadhyay](https://mokshupadhyay.com).
